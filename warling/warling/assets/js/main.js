@@ -66,8 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
     buyerBtn.addEventListener('click', function(e) {
         e.preventDefault();
         if (!localStorage.getItem('disclaimerAccepted')) {
-             alert('Anda harus menyetujui disclaimer terlebih dahulu.');
-             return;
+            alert('Anda harus menyetujui disclaimer terlebih dahulu.');
+            return;
         }
         welcomeView.classList.add('hidden');
         buyerView.classList.remove('hidden');
@@ -132,14 +132,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 userLocation = [-6.200000, 106.816666]; // Fallback ke Jakarta
                 map.setView(userLocation, 13);
                 fetchSellers(userLocation);
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
         );
     }
 
     async function fetchSellers(userCoords) {
         try {
-            const {  sellers, error } = await supabase
+            const { data: sellers, error } = await supabase
                 .from('sellers')
                 .select('id, name, description, broadcast_message, phone_number, location, last_updated_at')
                 .gte('last_updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()); // 30 hari

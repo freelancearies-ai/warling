@@ -62,28 +62,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            let result;
+            let rpcResult;
             if (isLoginMode) {
                 // Gunakan 'data' sesuai Supabase JS v2
                 const { data, error } = await supabase.rpc('check_pin', { seller_name: name, plain_pin: pin });
                 if (error) throw error;
-                result = { data: data }; // Sesuaikan struktur untuk penanganan di bawah
+                rpcResult = data; // RPC mengembalikan objek tunggal, bukan array
             } else {
                 // Gunakan 'data' sesuai Supabase JS v2
                 const { data, error } = await supabase.rpc('signup_seller', { shop_name: name, plain_pin: pin });
                 if (error) throw error;
-                result = { data: data }; // Sesuaikan struktur untuk penanganan di bawah
+                rpcResult = data; // RPC mengembalikan objek tunggal, bukan array
             }
 
             // Penanganan hasil RPC
-            if (result.error) {
-                throw new Error(result.error.message || 'Gagal otentikasi.');
+            if (rpcResult && rpcResult.error) { // Periksa jika RPC mengembalikan error dalam data
+                throw new Error(rpcResult.error);
             }
 
-            const sellerData = result.data; // Ambil data penjual dari RPC
-            if (sellerData && sellerData.id) {
-                currentSellerId = sellerData.id;
-                currentSellerName = sellerData.name;
+            if (rpcResult && rpcResult.id) { // Periksa keberadaan id di objek hasil
+                currentSellerId = rpcResult.id;
+                currentSellerName = rpcResult.name;
 
                 // Simpan HANYA nama di localStorage
                 localStorage.setItem('warling_seller_name', currentSellerName);
@@ -94,15 +93,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Isi form profil dengan data awal
                 profileNameInput.value = currentSellerName;
-                profileDescInput.value = sellerData.description || '';
-                profilePhoneInput.value = sellerData.phone_number || '';
-                profileTypeSelect.value = sellerData.seller_type || 'Makanan';
-                profileMessageInput.value = sellerData.broadcast_message || '';
+                profileDescInput.value = rpcResult.description || '';
+                profilePhoneInput.value = rpcResult.phone_number || '';
+                profileTypeSelect.value = rpcResult.seller_type || 'Makanan';
+                profileMessageInput.value = rpcResult.broadcast_message || '';
 
                 // Load produk
                 loadProducts(currentSellerId);
             } else {
-                throw new Error('Data penjual tidak valid.');
+                throw new Error('Data penjual tidak valid atau tidak ditemukan.');
             }
 
         } catch (error) {
