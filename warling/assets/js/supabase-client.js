@@ -1,7 +1,7 @@
 // supabase-client.js
 // Gantilah URL dan ANON_KEY dengan URL dan ANON KEY dari proyek Supabase Anda
-const SUPABASE_URL = 'https://<your-project-id>.supabase.co';
-const SUPABASE_ANON_KEY = '<your-anon-key>';
+const SUPABASE_URL = 'https://jtxhmzuyhsixggexmvbk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0eGhtenV5aHNpeGdnZXhtdmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMzQ5ODYsImV4cCI6MjA3NDcxMDk4Nn0.iIutSz3vvsMN0VNg9lVlQqC-gOW9re9Jk9xczVpahnY';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
