@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warling - Warung Keliling</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#333">
+</head>
+<body>
+    <main class="container">
+        <!-- Gerbang Utama -->
+        <section id="welcome-view" class="view">
+            <article class="text-center">
+                <hgroup>
+                    <h1>Warling</h1>
+                    <p>Temukan warung, pedagang, dan jasa lokal di sekitarmu!</p>
+                </hgroup>
+                <div class="grid">
+                    <button id="buyer-btn" class="btn btn-primary">Saya Pembeli</button>
+                    <button id="seller-btn" class="btn">Saya Penjual</button>
+                </div>
+            </article>
+        </section>
+
+        <!-- Tampilan Peta Pembeli -->
+        <section id="buyer-view" class="view hidden">
+            <header class="pico-header">
+                <nav>
+                    <ul>
+                        <li><a href="#" id="back-to-welcome">Kembali</a></li>
+                    </ul>
+                    <ul>
+                        <li><button id="share-qr-btn" class="btn btn-secondary">Bagikan (QR)</button></li>
+                    </ul>
+                </nav>
+            </header>
+
+            <div id="filter-bar" class="container-fluid">
+                <form id="search-form">
+                    <input type="text" id="search-input" placeholder="Cari nama, deskripsi...">
+                    <button type="submit">Cari</button>
+                </form>
+                <div>
+                    <label for="distance-slider">Radius: <span id="distance-value">10</span> km</label>
+                    <input type="range" id="distance-slider" min="1" max="25" value="10">
+                </div>
+            </div>
+
+            <div id="map"></div>
+
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="overlay hidden">
+                <div class="spinner"></div>
+                <p>Memuat lokasi dan data...</p>
+            </div>
+
+            <!-- QR Modal -->
+            <dialog id="qr-modal">
+                <article>
+                    <header>
+                        <h3>Bagikan Warling</h3>
+                        <a href="#" rel="prev" aria-label="Close" class="close"></a>
+                    </header>
+                    <p>Scan kode QR ini untuk membuka aplikasi Warling.</p>
+                    <div id="qr-placeholder">[QR Code akan muncul di sini]</div> <!-- Placeholder, QR akan di-generate JS -->
+                    <footer>
+                        <button class="close">Tutup</button>
+                    </footer>
+                </article>
+            </dialog>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script> <!-- Tambahkan baris ini -->
+    <script src="assets/js/supabase-client.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
