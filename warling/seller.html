@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warling - Dashboard Penjual</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#333">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>Warling - Dashboard Penjual</h1>
+        </header>
+
+        <!-- Area Login/Signup -->
+        <section id="auth-section">
+            <form id="auth-form">
+                <fieldset>
+                    <legend id="auth-title">Daftar / Masuk</legend>
+                    <input type="text" id="auth-name" placeholder="Nama Usaha" required>
+                    <input type="password" id="auth-pin" placeholder="PIN 6 Digit" required maxlength="6" pattern="[0-9]{6}">
+                    <div class="grid">
+                        <button type="button" id="toggle-auth-mode">Sudah Punya Akun? Masuk</button>
+                        <button type="submit">Submit</button>
+                    </div>
+                </fieldset>
+            </form>
+        </section>
+
+        <!-- Area Dashboard (Tersembunyi Awalnya) -->
+        <section id="dashboard-section" class="hidden">
+            <h2>Dasbor</h2>
+
+            <!-- Profil -->
+            <article id="profile-card">
+                <h3>Profil Usaha</h3>
+                <form id="profile-form">
+                    <input type="text" id="profile-name" readonly placeholder="Nama Usaha">
+                    <textarea id="profile-desc" placeholder="Deskripsi Usaha"></textarea>
+                    <input type="tel" id="profile-phone" placeholder="Nomor WhatsApp (tanpa 0)">
+                    <select id="profile-type">
+                        <option value="Makanan">Makanan</option>
+                        <option value="Minuman">Minuman</option>
+                        <option value="Jasa">Jasa</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                    <input type="text" id="profile-message" placeholder="Pesan Hari Ini">
+                    <button type="submit">Simpan Profil</button>
+                </form>
+            </article>
+
+            <!-- Lokasi -->
+            <article id="location-card">
+                <h3>Lokasi</h3>
+                <button id="update-location-btn">Perbarui Lokasi Saya Saat Ini</button>
+                <p id="location-status"></p>
+            </article>
+
+            <!-- Produk -->
+            <article id="products-card">
+                <h3>Produk</h3>
+                <form id="add-product-form">
+                    <input type="text" id="product-name" placeholder="Nama Produk" required>
+                    <input type="number" id="product-price" placeholder="Harga (Rp)" step="100" min="0" required>
+                    <button type="submit">Tambah Produk</button>
+                </form>
+                <ul id="products-list"></ul>
+            </article>
+
+            <!-- Logout -->
+            <div class="text-center">
+                <button id="logout-btn" class="btn btn-error">Keluar</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/supabase-client.js"></script>
+    <script src="assets/js/seller.js"></script>
+</body>
+</html>
