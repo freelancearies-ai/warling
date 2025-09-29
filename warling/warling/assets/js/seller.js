@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const productPriceInput = document.getElementById('product-price');
     const productsList = document.getElementById('products-list');
     const logoutBtn = document.getElementById('logout-btn');
+    // Elemen baru untuk tombol Buka/Tutup
+    const toggleStatusBtn = document.getElementById('toggle-status-btn');
 
     // Input Form
     const signupNameInput = document.getElementById('signup-name');
@@ -32,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentSellerId = null;
     let currentSellerName = null;
+    let currentSellerStatus = 'aktif'; // Default status saat login
 
     // Cek session di localStorage saat halaman dimuat
     // Jika ada nama di localStorage, tampilkan dashboard langsung
@@ -132,6 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rpcResult && rpcResult.id) {
                 currentSellerId = rpcResult.id;
                 currentSellerName = rpcResult.name;
+                currentSellerStatus = rpcResult.status; // Ambil status saat login
 
                 // Simpan HANYA nama di localStorage
                 localStorage.setItem('warling_seller_name', currentSellerName);
@@ -148,6 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 profileTypeSelect.value = rpcResult.seller_type || 'Makanan';
                 profileMessageInput.value = rpcResult.broadcast_message || '';
 
+                // Update tampilan tombol status
+                updateStatusDisplay(currentSellerStatus);
+
                 // Load produk
                 loadProducts(currentSellerId);
             } else {
@@ -157,6 +164,51 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Login error:', error);
             alert('Gagal masuk: ' + error.message);
+        }
+    });
+
+    // Fungsi untuk mengupdate status (Buka/Tutup)
+    async function updateStatus(newStatus) {
+        if (!currentSellerId) return;
+
+        try {
+            const { error } = await supabase
+                .from('sellers')
+                .update({ status: newStatus })
+                .eq('id', currentSellerId);
+
+            if (error) throw error;
+
+            currentSellerStatus = newStatus;
+            updateStatusDisplay(currentSellerStatus);
+            alert(`Status toko diubah menjadi: ${newStatus === 'aktif' ? 'Buka' : 'Tutup'}`);
+            // last_updated_at otomatis diupdate oleh Supabase trigger/function
+
+        } catch (error) {
+            console.error('Update status error:', error);
+            alert('Gagal memperbarui status: ' + error.message);
+        }
+    }
+
+    // Fungsi untuk memperbarui tampilan tombol status
+    function updateStatusDisplay(status) {
+        if (status === 'aktif') {
+            toggleStatusBtn.textContent = 'Tutup Toko';
+            toggleStatusBtn.classList.remove('btn-success'); // Opsional: ubah warna
+            toggleStatusBtn.classList.add('btn-error'); // Opsional: ke merah
+        } else {
+            toggleStatusBtn.textContent = 'Buka Toko';
+            toggleStatusBtn.classList.remove('btn-error'); // Opsional: ubah warna
+            toggleStatusBtn.classList.add('btn-success'); // Opsional: ke hijau
+        }
+    }
+
+    // Event listener untuk tombol Buka/Tutup
+    toggleStatusBtn.addEventListener('click', function() {
+        if (currentSellerStatus === 'aktif') {
+            updateStatus('nonaktif');
+        } else {
+            updateStatus('aktif');
         }
     });
 
@@ -323,6 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     logoutBtn.addEventListener('click', function() {
         currentSellerId = null;
         currentSellerName = null;
+        currentSellerStatus = 'aktif'; // Reset status lokal
         // Hanya hapus nama, bukan PIN (karena tidak disimpan)
         localStorage.removeItem('warling_seller_name');
         // Reset form dan tampilkan form login
