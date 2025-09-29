@@ -1,60 +1,75 @@
 // seller.js
 document.addEventListener('DOMContentLoaded', function() {
-    const authSection = document.getElementById('auth-section');
-    const dashboardSection = document.getElementById('dashboard-section');
-    const authForm = document.getElementById('auth-form');
-    const authTitle = document.getElementById('auth-title');
-    const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
-    const authNameInput = document.getElementById('auth-name');
-    const authPinInput = document.getElementById('auth-pin');
+    // Elemen Form
+    const signupSection = document.getElementById('signup-section');
+    const loginSection = document.getElementById('login-section');
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    const showLoginLink = document.getElementById('show-login-link');
+    const showSignupLink = document.getElementById('show-signup-link');
 
+    // Elemen Dashboard
+    const dashboardSection = document.getElementById('dashboard-section');
     const profileForm = document.getElementById('profile-form');
     const profileNameInput = document.getElementById('profile-name');
     const profileDescInput = document.getElementById('profile-desc');
     const profilePhoneInput = document.getElementById('profile-phone');
     const profileTypeSelect = document.getElementById('profile-type');
     const profileMessageInput = document.getElementById('profile-message');
-
     const updateLocationBtn = document.getElementById('update-location-btn');
     const locationStatus = document.getElementById('location-status');
-
     const addProductForm = document.getElementById('add-product-form');
     const productNameInput = document.getElementById('product-name');
     const productPriceInput = document.getElementById('product-price');
     const productsList = document.getElementById('products-list');
-
     const logoutBtn = document.getElementById('logout-btn');
+
+    // Input Form
+    const signupNameInput = document.getElementById('signup-name');
+    const signupPinInput = document.getElementById('signup-pin');
+    const loginNameInput = document.getElementById('login-name');
+    const loginPinInput = document.getElementById('login-pin');
 
     let currentSellerId = null;
     let currentSellerName = null;
 
     // Cek session di localStorage saat halaman dimuat
+    // Jika ada nama di localStorage, tampilkan dashboard langsung
     const savedName = localStorage.getItem('warling_seller_name');
     if (savedName) {
-        authNameInput.value = savedName; // Isi otomatis nama
+        // Secara opsional, bisa tetap menampilkan form login dan mengisi otomatis
+        // loginNameInput.value = savedName;
+        // Atau, langsung tampilkan dashboard jika yakin session valid
+        // Untuk sekarang, kita coba login otomatis ke dashboard jika nama ada
+        // Kita gunakan fungsi login dengan nama dari localStorage
+        // Namun, ini tidak validasi PIN. Lebih baik tetap login manual.
+        // Jadi, kita biarkan form login muncul, tapi isi nama otomatis.
+        loginNameInput.value = savedName; // Isi otomatis nama di form login
+        loginSection.classList.remove('hidden'); // Tampilkan form login
+        signupSection.classList.add('hidden'); // Sembunyikan form signup
+    } else {
+        signupSection.classList.remove('hidden'); // Tampilkan form signup jika tidak ada session
+        loginSection.classList.add('hidden'); // Sembunyikan form login
     }
 
-    // Toggle mode Sign Up / Login
-    let isLoginMode = true;
-
-    function toggleAuthMode() {
-        isLoginMode = !isLoginMode;
-        if (isLoginMode) {
-            authTitle.textContent = 'Masuk';
-            toggleAuthModeBtn.textContent = 'Belum Punya Akun? Daftar';
-        } else {
-            authTitle.textContent = 'Daftar';
-            toggleAuthModeBtn.textContent = 'Sudah Punya Akun? Masuk';
-        }
-        authPinInput.value = ''; // Kosongkan PIN saat toggle
-    }
-    toggleAuthModeBtn.addEventListener('click', toggleAuthMode);
-
-    // Submit form auth (Sign Up / Login)
-    authForm.addEventListener('submit', async function(e) {
+    // Fungsi untuk beralih antar form
+    showLoginLink.addEventListener('click', function(e) {
         e.preventDefault();
-        const name = authNameInput.value.trim();
-        const pin = authPinInput.value.trim();
+        loginSection.classList.remove('hidden');
+        signupSection.classList.add('hidden');
+    });
+
+    showSignupLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        signupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    });
+
+    // Submit form pendaftaran
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = signupNameInput.value.trim();
+        const pin = signupPinInput.value.trim();
 
         if (!name || !pin) {
             alert('Nama Usaha dan PIN harus diisi.');
@@ -62,33 +77,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            let rpcResult;
-            if (isLoginMode) {
-                // Gunakan 'data' sesuai Supabase JS v2
-                const { data, error } = await supabase.rpc('check_pin', { seller_name: name, plain_pin: pin });
-                if (error) throw error;
-                rpcResult = data; // RPC mengembalikan objek tunggal, bukan array
-            } else {
-                // Gunakan 'data' sesuai Supabase JS v2
-                const { data, error } = await supabase.rpc('signup_seller', { shop_name: name, plain_pin: pin });
-                if (error) throw error;
-                rpcResult = data; // RPC mengembalikan objek tunggal, bukan array
-            }
+            const { data: rpcResult, error } = await supabase.rpc('signup_seller', { shop_name: name, plain_pin: pin });
+            if (error) throw error;
 
-            // Penanganan hasil RPC
-            if (rpcResult && rpcResult.error) { // Periksa jika RPC mengembalikan error dalam data
+            // Penanganan hasil RPC signup
+            if (rpcResult && rpcResult.error) {
                 throw new Error(rpcResult.error);
             }
 
-            if (rpcResult && rpcResult.id) { // Periksa keberadaan id di objek hasil
+            if (rpcResult && rpcResult.id) {
+                alert('Pendaftaran berhasil!');
+                // Reset form
+                signupForm.reset();
+                // Login otomatis atau arahkan ke form login
+                loginNameInput.value = name; // Isi nama di form login
+                loginPinInput.value = pin; // Isi PIN di form login (INGAT: Ini tidak aman secara praktik umum, hanya untuk kemudahan dalam kasus ini)
+                // Beralih ke form login
+                signupSection.classList.add('hidden');
+                loginSection.classList.remove('hidden');
+                // Fokus ke PIN agar pengguna bisa langsung submit
+                loginPinInput.focus();
+                // Atau, langsung coba login otomatis (opsional)
+                // loginForm.dispatchEvent(new Event('submit')); // Ini akan memicu submit login
+            } else {
+                throw new Error('Data penjual tidak valid setelah pendaftaran.');
+            }
+
+        } catch (error) {
+            console.error('Signup error:', error);
+            alert('Gagal mendaftar: ' + error.message);
+        }
+    });
+
+    // Submit form login
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = loginNameInput.value.trim();
+        const pin = loginPinInput.value.trim();
+
+        if (!name || !pin) {
+            alert('Nama Usaha dan PIN harus diisi.');
+            return;
+        }
+
+        try {
+            const { data: rpcResult, error } = await supabase.rpc('check_pin', { seller_name: name, plain_pin: pin });
+            if (error) throw error;
+
+            // Penanganan hasil RPC login
+            if (rpcResult && rpcResult.error) {
+                throw new Error(rpcResult.error);
+            }
+
+            if (rpcResult && rpcResult.id) {
                 currentSellerId = rpcResult.id;
                 currentSellerName = rpcResult.name;
 
                 // Simpan HANYA nama di localStorage
                 localStorage.setItem('warling_seller_name', currentSellerName);
 
-                // Sembunyikan auth, tampilkan dashboard
-                authSection.classList.add('hidden');
+                // Sembunyikan form, tampilkan dashboard
+                signupSection.classList.add('hidden');
+                loginSection.classList.add('hidden');
                 dashboardSection.classList.remove('hidden');
 
                 // Isi form profil dengan data awal
@@ -101,12 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Load produk
                 loadProducts(currentSellerId);
             } else {
-                throw new Error('Data penjual tidak valid atau tidak ditemukan.');
+                throw new Error('Data penjual tidak valid atau tidak ditemukan saat login.');
             }
 
         } catch (error) {
-            console.error('Auth error:', error);
-            alert('Gagal: ' + error.message);
+            console.error('Login error:', error);
+            alert('Gagal masuk: ' + error.message);
         }
     });
 
@@ -214,8 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // Gunakan 'data' bukan 'products' sesuai Supabase JS v2
-            const { data: products, error } = await supabase
+            const { products, error } = await supabase
                 .from('products')
                 .select('*')
                 .eq('seller_id', sellerId);
@@ -276,12 +325,15 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSellerName = null;
         // Hanya hapus nama, bukan PIN (karena tidak disimpan)
         localStorage.removeItem('warling_seller_name');
-        // Reset form dan tampilkan auth
-        authForm.reset();
-        authSection.classList.remove('hidden');
+        // Reset form dan tampilkan form login
+        loginForm.reset();
+        signupSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
         dashboardSection.classList.add('hidden');
-        isLoginMode = true; // Kembali ke mode login
-        authTitle.textContent = 'Masuk';
-        toggleAuthModeBtn.textContent = 'Belum Punya Akun? Daftar';
+        // Isi otomatis nama dari localStorage jika ada (untuk pengalaman lanjutan)
+        const savedName = localStorage.getItem('warling_seller_name');
+        if (savedName) {
+            loginNameInput.value = savedName;
+        }
     });
 });

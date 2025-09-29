@@ -15,19 +15,30 @@
             <h1>Warling - Dashboard Penjual</h1>
         </header>
 
-        <!-- Area Login/Signup -->
-        <section id="auth-section">
-            <form id="auth-form">
+        <!-- Area Form Pendaftaran -->
+        <section id="signup-section">
+            <h2>Daftar Akun Baru</h2>
+            <form id="signup-form">
                 <fieldset>
-                    <legend id="auth-title">Daftar / Masuk</legend>
-                    <input type="text" id="auth-name" placeholder="Nama Usaha" required>
-                    <input type="password" id="auth-pin" placeholder="PIN 6 Digit" required maxlength="6" pattern="[0-9]{6}">
-                    <div class="grid">
-                        <button type="button" id="toggle-auth-mode">Sudah Punya Akun? Masuk</button>
-                        <button type="submit">Submit</button>
-                    </div>
+                    <input type="text" id="signup-name" placeholder="Nama Usaha Baru" required>
+                    <input type="password" id="signup-pin" placeholder="PIN 6 Digit Baru" required maxlength="6" pattern="[0-9]{6}">
+                    <button type="submit">Daftar</button>
                 </fieldset>
             </form>
+            <p>Sudah punya akun? <a href="#" id="show-login-link">Masuk di sini</a></p>
+        </section>
+
+        <!-- Area Form Login -->
+        <section id="login-section" class="hidden">
+            <h2>Masuk ke Akun</h2>
+            <form id="login-form">
+                <fieldset>
+                    <input type="text" id="login-name" placeholder="Nama Usaha" required>
+                    <input type="password" id="login-pin" placeholder="PIN 6 Digit" required maxlength="6" pattern="[0-9]{6}">
+                    <button type="submit">Masuk</button>
+                </fieldset>
+            </form>
+            <p>Belum punya akun? <a href="#" id="show-signup-link">Daftar di sini</a></p>
         </section>
 
         <!-- Area Dashboard (Tersembunyi Awalnya) -->
